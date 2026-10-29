@@ -9,7 +9,7 @@ export default function WishlistForm() {
         e.preventDefault();
         setStatus({ message: 'Sending...', type: '' });
         try {
-            const res = await fetch('http://localhost:8000/submit-wishlist', {
+            const res = await fetch('https://giftlist-4yis.onrender.com/submit-wishlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
