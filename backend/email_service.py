@@ -3,7 +3,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 from dotenv import load_dotenv
-from schemas import WishlistRequest
+from .schemas import WishlistRequest
 
 load_dotenv()
 

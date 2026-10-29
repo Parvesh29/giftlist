@@ -9,3 +9,9 @@
 | 2 | Self | Matches | N/A |
 | 3 | Self | Matches | N/A |
 | 4 | Self | Matches | N/A |
+
+Task 1: complete (commit bc395a0, review clean)
+
+Task 2: complete (commit f821b4a, review clean)
+
+Task 3: complete (commit b1c908f, review clean)

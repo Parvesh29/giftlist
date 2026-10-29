@@ -1,5 +1,6 @@
 import React from 'react';
 import WishlistForm from './components/WishlistForm';
+import './App.css';
 
 function App() {
   return (

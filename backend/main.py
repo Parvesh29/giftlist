@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import WishlistRequest
-from email_service import send_wishlist_email
+from .schemas import WishlistRequest
+from .email_service import send_wishlist_email
 
 app = FastAPI()
 
