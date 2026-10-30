@@ -7,10 +7,15 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://togiftlist.netlify.app"],
+    allow_origins=["*"], 
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+async def root():
+    return {"message": "Backend is running!"}
 
 @app.post("/submit-wishlist")
 async def submit_wishlist(request: WishlistRequest):

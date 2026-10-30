@@ -8,8 +8,14 @@ export default function WishlistForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus({ message: 'Sending...', type: '' });
+
+        // SMART URL: Use localhost if running locally, otherwise use Render
+        const backendUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:8000/submit-wishlist' 
+            : 'https://giftlist-4yis.onrender.com/submit-wishlist';
+
         try {
-            const res = await fetch('https://giftlist-4yis.onrender.com/submit-wishlist', {
+            const res = await fetch(backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

@@ -8,8 +8,17 @@ from .schemas import WishlistRequest
 load_dotenv()
 
 def send_wishlist_email(data: WishlistRequest):
+    # Fallback to default Gmail settings if .env is missing
+    smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+    smtp_port = os.getenv('SMTP_PORT', '587')
+    smtp_user = os.getenv('SMTP_USER')
+    smtp_pass = os.getenv('SMTP_PASSWORD')
+
+    if not smtp_user or not smtp_pass:
+        raise Exception("SMTP_USER or SMTP_PASSWORD not found in environment variables")
+
     msg = MIMEMultipart()
-    msg['From'] = os.getenv('SMTP_USER')
+    msg['From'] = smtp_user
     msg['To'] = 'parveshkumara001@gmail.com'
     msg['Subject'] = f"New Wishlist from {data.name}"
     
@@ -22,8 +31,8 @@ def send_wishlist_email(data: WishlistRequest):
     """
     msg.attach(MIMEText(body, 'html'))
     
-    with smtplib.SMTP(os.getenv('SMTP_SERVER'), int(os.getenv('SMTP_PORT'))) as server:
+    with smtplib.SMTP(smtp_server, int(smtp_port)) as server:
         server.starttls()
-        server.login(os.getenv('SMTP_USER'), os.getenv('SMTP_PASSWORD'))
+        server.login(smtp_user, smtp_pass)
         server.send_message(msg)
     return True
