@@ -1,38 +1,48 @@
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
 from .schemas import WishlistRequest
 
 load_dotenv()
 
 def send_wishlist_email(data: WishlistRequest):
-    # Fallback to default Gmail settings if .env is missing
-    smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-    smtp_port = os.getenv('SMTP_PORT', '587')
-    smtp_user = os.getenv('SMTP_USER')
-    smtp_pass = os.getenv('SMTP_PASSWORD')
-
-    if not smtp_user or not smtp_pass:
-        raise Exception("SMTP_USER or SMTP_PASSWORD not found in environment variables")
-
-    msg = MIMEMultipart()
-    msg['From'] = smtp_user
-    msg['To'] = 'parveshkumara001@gmail.com'
-    msg['Subject'] = f"New Wishlist from {data.name}"
+    # Use the API key from environment variables
+    api_key = os.getenv('SENDGRID_API_KEY')
     
-    body = f"""
-    <h2>New Wishlist Submission</h2>
-    <p><b>Name:</b> {data.name}</p>
-    <p><b>Items:</b> {data.item_names}</p>
-    <p><b>Priority:</b> {data.priority}</p>
-    <p><b>Link:</b> <a href='{data.item_link}'>{data.item_link}</a></p>
+    if not api_key:
+        raise Exception("SENDGRID_API_KEY not found in environment variables")
+
+    sg = SendGridAPIClient(api_key)
+    
+    # The 'from_email' must be a verified sender in your SendGrid account
+    from_email = os.getenv('SENDGRID_FROM_EMAIL', 'parveshkumara001@gmail.com')
+    to_email = 'parveshkumara001@gmail.com'
+    
+    html_content = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+        <h2 style="color: #4a90e2; text-align: center;">🎁 New Wishlist Submission!</h2>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p><strong>Name:</strong> {data.name}</p>
+        <p><strong>Items:</strong> {data.item_names}</p>
+        <p><strong>Priority:</strong> {data.priority}</p>
+        <p><strong>Link:</strong> <a href="{data.item_link}">{data.item_link}</a></p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <p style="font-size: 12px; color: #888; text-align: center;">Sent via Wishlist App</p>
+    </div>
     """
-    msg.attach(MIMEText(body, 'html'))
     
-    with smtplib.SMTP(smtp_server, int(smtp_port)) as server:
-        server.starttls()
-        server.login(smtp_user, smtp_pass)
-        server.send_message(msg)
-    return True
+    message = Mail(
+        from_email=from_email,
+        to_emails=to_email,
+        subject=f"New Wishlist from {data.name}",
+        html_content=html_content
+    )
+    
+    response = sg.send(message)
+    
+    # SendGrid returns 202 Accepted if successful
+    if response.status_code >= 200 and response.status_code < 300:
+        return True
+    else:
+        raise Exception(f"SendGrid error: {response.status_code}")
